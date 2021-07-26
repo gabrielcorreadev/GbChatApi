@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDeviceManagerTable extends Migration
+class CreateDevicesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateDeviceManagerTable extends Migration
      */
     public function up()
     {
-        Schema::create('device_manager', function (Blueprint $table) {
+        Schema::create('devices', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('access_token_id', 100)->index();
@@ -32,6 +32,6 @@ class CreateDeviceManagerTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('device_manager');
+        Schema::dropIfExists('devices');
     }
 }

@@ -2,7 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\V1\Account\DeviceManagerController;
+use App\Http\Controllers\Api\V1\Account\DeviceController;
+use App\Http\Controllers\Api\V1\Account\AccountController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,13 +16,17 @@ use App\Http\Controllers\Api\V1\Account\DeviceManagerController;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::post('auth/login', [AccountController::class, 'login']);
+Route::post('auth/signup', [AccountController::class, 'signup']);
+
+Route::group(['middleware' => ['auth:api'], 'prefix' => 'auth'], function ($router) {
+    Route::post('/logout', [AccountController::class, 'logout']);
+    Route::get('/me', [AccountController::class, 'me']);
 });
 
 Route::group(['middleware' => ['auth:api'], 'prefix' => 'devices'], function ($router) {
-    Route::get('/', [DeviceManagerController::class, 'all_devices']);
-    Route::post('/logout-all', [DeviceManagerController::class, 'logout_all_devices']); // Remove all logged-in devices, except the current device.
-    Route::post('/{id}/logout', [DeviceManagerController::class, 'logout_device']); // Logout a specific device using its session
+    Route::get('/', [DeviceController::class, 'all_devices']);
+    Route::post('/logout-all', [DeviceController::class, 'logout_all_devices']); // Remove all logged-in devices, except the current device.
+    Route::post('/{id}/logout', [DeviceController::class, 'logout_device']); // Logout a specific device using its session
 });
 

@@ -3,18 +3,18 @@
 namespace App\Http\Controllers\Api\V1\Account;
 
 use App\Http\Controllers\Controller;
-use App\Models\DeviceManager;
-use App\Http\Resources\DeviceManagerCollection as DeviceManagerCollection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Models\Device;
+use App\Http\Resources\DeviceResource as DeviceResource;
+use Illuminate\Support\Facades\Auth;
 
-class DeviceManagerController extends Controller
+class DeviceController extends Controller
 {
     public function all_devices(Request $request)
     {
         $user = $request->user()->token();
-        $devices = DeviceManager::where('access_token_id', '!=', $user->id)->get();
-        return DeviceManagerCollection::collection($devices);
+        $devices = Device::where('access_token_id', '!=', $user->id)->get();
+        return DeviceResource::collection($devices);
     }
 
     public function logout_all_devices(Request $request)
