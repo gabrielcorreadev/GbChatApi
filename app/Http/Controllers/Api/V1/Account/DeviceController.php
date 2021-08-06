@@ -7,25 +7,35 @@ use Illuminate\Http\Request;
 use App\Models\Device;
 use App\Http\Resources\DeviceResource as DeviceResource;
 use Illuminate\Support\Facades\Auth;
+use App\Repositories\Contracts\DeviceRepositoryInterface;
 
 class DeviceController extends Controller
 {
+    /** @var DeviceRepository */
+    private $deviceRepository;
+
+    /**
+     * Create a new controller instance.
+     *
+     * @param  DeviceRepository  $conversationRepo
+     */
+    public function __construct(DeviceRepositoryInterface $deviceRepo)
+    {
+        $this->deviceRepository = $deviceRepo;
+    }
+
+
     public function all_devices(Request $request)
     {
-        $user = $request->user()->token();
-        $devices = Device::where('access_token_id', '!=', $user->id)->get();
+        $devices = $this->deviceRepository->getlistDevices($request);
         return DeviceResource::collection($devices);
     }
 
     public function logout_all_devices(Request $request)
     {
-        $user = $request->user()->token();
-        $userTokens = Auth::user()->tokens->where('id', '!=', $user->id);
+        $isRemoved = $this->deviceRepository->removeListDevices($request);
 
-        if ($userTokens) {
-            foreach ($userTokens as $token) {
-                $token->delete();
-            }
+        if ($isRemoved) {
             return response()->json(['message' => __('auth.logout_all')], 200);
         }
         return response()->json(['message' => __('auth.no_devices_found')], 400);
@@ -33,13 +43,11 @@ class DeviceController extends Controller
 
     public function logout_device($id)
     {
-        $userToken = Auth::user()->tokens->firstWhere('id', $id);
+        $isRemoved = $this->deviceRepository->removeDeviceById($id);
 
-        if ($userToken) {
-            $userToken->delete();
+        if ($isRemoved) {
             return response()->json(['message' => __('auth.logout_device_custom')], 200);
         }
-
         return response()->json(['message' => __('auth.device_not_found')], 400);
     }
 }
