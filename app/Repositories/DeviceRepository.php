@@ -18,7 +18,7 @@ class DeviceRepository implements DeviceRepositoryInterface
     public function getlistDevices(Request $request)
     {
         $user = $request->user()->token();
-        $userTokens = Auth::user()->tokens->where('id', '!=', $user->id)->pluck('id')->toArray();
+        $userTokens = Auth::user()->tokens->pluck('id')->toArray();
 
         $devices = $this->device->whereIn('access_token_id', $userTokens)->get();
         return $devices;
