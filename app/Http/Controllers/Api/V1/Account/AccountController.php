@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Device;
+use App\Models\Photo; 
 
 class AccountController extends Controller
 {
@@ -29,6 +30,8 @@ class AccountController extends Controller
             'email' => $request->email,
             'password' => bcrypt($request->password)
         ]);
+
+        $user->sendEmailVerificationNotification();
 
         $user_token = $user->createToken($request->device_name);
 
@@ -88,8 +91,12 @@ class AccountController extends Controller
 
     protected function respondWithToken($token)
     {
+
+        $photo = Photo::where('user_id', Auth::user()->id)->where('type', '1')->first();
+
         return response()->json([
             'user' => auth()->user(),
+            'photo_profile' => $photo->path,
             'access_token' => $token,
             'token_type' => 'bearer'
         ]);
