@@ -3,6 +3,12 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Repositories\Contracts\DeviceRepositoryInterface;
+use App\Repositories\DeviceRepository;
+use App\Repositories\Contracts\AccountRepositoryInterface;
+use App\Repositories\AccountRepository;
+use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\UserRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,7 +19,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('App\Repositories\Contracts\DeviceRepositoryInterface', 'App\Repositories\DeviceRepository');
+        $this->app->bind(DeviceRepositoryInterface::class, DeviceRepository::class);
+        $this->app->bind(AccountRepositoryInterface::class, AccountRepository::class);
+        $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
     }
 
     /**

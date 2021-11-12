@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Passport\HasApiTokens;
 use App\Notifications\VerifyEmail;
 
@@ -23,6 +24,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'phone',
+        'latitude',
+        'longitude',
     ];
 
     /**
@@ -33,6 +37,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $hidden = [
         'password',
         'remember_token',
+        'photo_url'
     ];
 
     /**
@@ -44,6 +49,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
+    protected $appends = ['photo'];
+
     /**
      * Send the email verification notification.
      *
@@ -52,5 +59,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendEmailVerificationNotification()
     {
         $this->notify(new VerifyEmail); // my notification
+    }
+
+    public function getPhotoAttribute()
+    {
+        return getDefaultPhotoUser($this->attributes['photo_url']);
     }
 }

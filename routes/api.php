@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Account\DeviceController;
 use App\Http\Controllers\Api\V1\Account\AccountController;
 use App\Http\Controllers\Api\V1\Account\VerificationController;
+use App\Http\Controllers\Api\V1\User\UserController;
 use App\Http\Controllers\Api\V1\Upload\PhotoUploadController;
 
 /*
@@ -33,6 +34,14 @@ Route::group(['middleware' => ['auth:api'], 'prefix' => 'devices'], function ($r
     Route::get('/', [DeviceController::class, 'all_devices']);
     Route::post('/logout-all', [DeviceController::class, 'logout_all_devices']); // Remove all logged-in devices, except the current device.
     Route::post('/{id}/logout', [DeviceController::class, 'logout_device']); // Logout a specific device using its session
+});
+
+Route::group(['middleware' => ['auth:api'], 'prefix' => 'users'], function ($router) {
+    Route::get('/', [UserController::class, 'index']);
+    Route::get('/nearby-location', [UserController::class, 'get_list_nearby_users']);
+    Route::get('/{id}', [UserController::class, 'show']);
+    Route::get('/{id}/follow', [UserController::class, 'show']);
+    Route::get('/{id}/following', [UserController::class, 'show']);
 });
 
 Route::group(['middleware' => ['auth:api'], 'prefix' => 'photos'], function ($router) {

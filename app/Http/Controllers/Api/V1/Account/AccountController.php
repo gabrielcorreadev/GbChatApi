@@ -6,12 +6,23 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
-use App\Models\Device;
-use App\Models\Photo; 
+use App\Repositories\Contracts\AccountRepositoryInterface; 
 
 class AccountController extends Controller
 {
+        /** @var AccountRepository */
+        private $accountRepository;
+
+        /**
+         * Create a new controller instance.
+         *
+         * @param  DeviceRepository 
+         */
+        public function __construct(AccountRepositoryInterface $accountRepo)
+        {
+            $this->accountRepository = $accountRepo;
+        }
+
     public function signup(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -25,22 +36,7 @@ class AccountController extends Controller
             return response()->json(['message' => $validator->errors()->first()], 400);
         }
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password)
-        ]);
-
-        $user->sendEmailVerificationNotification();
-
-        $user_token = $user->createToken($request->device_name);
-
-        Device::create([
-            'name' => $request->device_name,
-            'access_token_id' => $user_token->token->id,
-            'lat' => $request->lat,
-            'lng' => $request->lng,
-        ]);
+        $this->accountRepository->createAccount($request);
 
         return response()->json(['token' => $request->device_name], 200);
     }
@@ -60,26 +56,13 @@ class AccountController extends Controller
         if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             return response(['message' => __('auth.failed_login')], 400);
         }
-
-        $user = User::find(auth()->user()->id);
         
-        $user_token = $user->createToken($request->device_name);
-
-        Device::create([
-            'name' => $request->device_name,
-            'access_token_id' => $user_token->token->id,
-            'lat' => $request->lat,
-            'lng' => $request->lng,
-        ]);
-
-        return $this->respondWithToken($user_token->accessToken);
+        return $this->accountRepository->authSession($request);
     }
 
     public function logout(Request $request)
     {
-        $token = $request->user()->token();
-        $token->revoke();
-        $token->delete();
+        $this->accountRepository->removeSession($request);
         $response = ['message' => __('auth.logout')];
         return response($response, 200);
     }
@@ -87,18 +70,5 @@ class AccountController extends Controller
     public function me()
     {
         return response()->json(['user' => auth()->user()], 200);
-    }
-
-    protected function respondWithToken($token)
-    {
-
-        $photo = Photo::where('user_id', Auth::user()->id)->where('type', '1')->first();
-
-        return response()->json([
-            'user' => auth()->user(),
-            'photo_profile' => $photo->path,
-            'access_token' => $token,
-            'token_type' => 'bearer'
-        ]);
     }
 }
