@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1\Follower;
+namespace App\Http\Controllers\Api\V1\Chat;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class FollowerController extends Controller
+class ChatController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function getConversation()
+    public function index()
     {
         //
     }
@@ -28,12 +28,34 @@ class FollowerController extends Controller
     }
 
     /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        //
+    }
+
+    /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function getMessages($id)
+    public function edit($id)
     {
         //
     }
@@ -45,7 +67,7 @@ class FollowerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function sendMessage(Request $request, $id)
+    public function update(Request $request, $id)
     {
         //
     }

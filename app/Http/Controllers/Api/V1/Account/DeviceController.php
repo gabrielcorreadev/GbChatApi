@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Account;
 
+use App\Http\Controllers\Api\AppBaseController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Device;
@@ -9,7 +10,7 @@ use App\Http\Resources\DeviceResource as DeviceResource;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\Contracts\DeviceRepositoryInterface;
 
-class DeviceController extends Controller
+class DeviceController extends AppBaseController
 {
     /** @var DeviceRepository */
     private $deviceRepository;
@@ -36,9 +37,9 @@ class DeviceController extends Controller
         $isRemoved = $this->deviceRepository->removeListDevices($request);
 
         if ($isRemoved) {
-            return response()->json(['message' => __('auth.logout_all')], 200);
+            return $this->sendSuccess(__('auth.logout_all'));
         }
-        return response()->json(['message' => __('auth.no_devices_found')], 400);
+        return $this->sendError(__('auth.no_devices_found'), 400);
     }
 
     public function logout_device($id)
@@ -46,8 +47,8 @@ class DeviceController extends Controller
         $isRemoved = $this->deviceRepository->removeDeviceById($id);
 
         if ($isRemoved) {
-            return response()->json(['message' => __('auth.logout_device_custom')], 200);
+            return $this->sendSuccess(__('auth.logout_device_custom'));
         }
-        return response()->json(['message' => __('auth.device_not_found')], 400);
+        return $this->sendError(__('auth.device_not_found'), 400);
     }
 }

@@ -21,4 +21,5 @@ return [
     'logout_all' => 'Você foi desconectado com sucesso de todos os dispositivos.',
     'device_not_found' => 'Dispositivo não encontrado.',
     'no_devices_found' => 'Nenhum dispositivo encontrado.',
+    'login_successfully' => 'Login realizado com sucesso',
 ];

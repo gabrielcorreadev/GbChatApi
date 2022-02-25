@@ -1,14 +1,14 @@
 <?php
 
 namespace App\Http\Controllers\Api\V1\Account;
-
+use App\Http\Controllers\Api\AppBaseController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\Contracts\AccountRepositoryInterface; 
 
-class AccountController extends Controller
+class AccountController extends AppBaseController
 {
         /** @var AccountRepository */
         private $accountRepository;
@@ -33,12 +33,11 @@ class AccountController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['message' => $validator->errors()->first()], 400);
+            return $this->sendError($validator->errors()->first(), 400);
         }
-
-        $this->accountRepository->createAccount($request);
-
-        return response()->json(['token' => $request->device_name], 200);
+        
+        $data = $this->accountRepository->createAccount($request);
+        return $this->sendResponse($data, __('auth.login_successfully'));
     }
 
     public function login(Request $request)
@@ -50,25 +49,25 @@ class AccountController extends Controller
 
 
         if ($validator->fails()) {
-            return response()->json(['message' => $validator->errors()->first()], 400);
+            return $this->sendError($validator->errors()->first(), 400);
         }
 
         if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            return response(['message' => __('auth.failed_login')], 400);
+            return $this->sendError(__('auth.failed_login'), 400);
         }
         
-        return $this->accountRepository->authSession($request);
+        $data = $this->accountRepository->authSession($request);
+        return $this->sendResponse($data, __('auth.login_successfully'));
     }
 
     public function logout(Request $request)
     {
         $this->accountRepository->removeSession($request);
-        $response = ['message' => __('auth.logout')];
-        return response($response, 200);
+        return $this->sendSuccess(__('auth.logout'));
     }
 
     public function me()
     {
-        return response()->json(['user' => auth()->user()], 200);
+        return $this->sendData(auth()->user());
     }
 }

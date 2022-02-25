@@ -5,14 +5,18 @@ use App\Models\User;
 use App\Models\Device;
 use App\Repositories\Contracts\AccountRepositoryInterface;
 use Illuminate\Http\Request;
+use Notification;
+use App\Notifications\NewLogin;
+use App\Repositories\Contracts\MapRepositoryInterface; 
 
 class AccountRepository implements AccountRepositoryInterface
 {   
     protected $device;
-        
-    public function __construct(User $user)
+    protected $mapRepository;
+
+    public function __construct(User $user, MapRepositoryInterface $mapRepo)
     {
-            $this->user = $user;
+            $this->mapRepository = $mapRepo;
     }
 
     public function createAccount(Request $request)
@@ -23,6 +27,7 @@ class AccountRepository implements AccountRepositoryInterface
             'password' => bcrypt($request->password),
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
+            'photo_url' => $request->photo_url ? $request->photo_url : null,
         ]);
 
         $user->sendEmailVerificationNotification();
@@ -36,7 +41,7 @@ class AccountRepository implements AccountRepositoryInterface
             'longitude' => $request->longitude,
         ]);
 
-        return $user;
+        return $this->respondWithToken($user_token->accessToken);
     }
 
     public function authSession(Request $request)
@@ -56,7 +61,15 @@ class AccountRepository implements AccountRepositoryInterface
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
         ]);
+
+        $details = [
+            'name' => $user->name,
+            'email' => $user->email,
+            'localization' => $this->mapRepository->getAddress($request->latitude, $request->longitude),
+            'device_name' => $request->device_name,
+        ];
         
+        $user->notify(new NewLogin($details));
         return $this->respondWithToken($user_token->accessToken);
     }
 
@@ -69,10 +82,10 @@ class AccountRepository implements AccountRepositoryInterface
 
     public function respondWithToken($token)
     {
-        return response()->json([
+        return [
             'user' => auth()->user(),
             'access_token' => $token,
             'token_type' => 'bearer'
-        ]);
+        ];
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use App\Repositories\Contracts\MapRepositoryInterface; 
 
 class DeviceResource extends JsonResource
 {
@@ -14,17 +15,18 @@ class DeviceResource extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
+
     public function toArray($request)
     {
         return [
             'id' => $this->id,
             'name' => $this->name,
             'access_token_id' => $this->access_token_id,
-            'lat' => $this->lat,
-            'lng' => $this->lng,
+            'lat' => $this->latitude,
+            'lng' => $this->longitude,
             'created_at' => $this->created_at,
             'current_device' => $this->checkCurrentDevice($request, $this->access_token_id),
-            'localization' => $this->getCurrentLocalization($this->lat, $this->lng),
+            'localization' => getCurrentLocalization($this->latitude, $this->longitude),
         ];
     }
 
@@ -35,16 +37,5 @@ class DeviceResource extends JsonResource
             return true;
         }
         return false;
-    }
-
-    protected function getCurrentLocalization($lat, $lng)
-    {
-        $response = Http::get('https://revgeocode.search.hereapi.com/v1/revgeocode?at='. $lat .','. $lng .'&q=&apiKey='.env('HERE_MAPS_API_KEY'));
-
-        if($response->successful())
-        {
-            return $response->object()->items[0]->address->city.' - '.$response->object()->items[0]->address->stateCode;
-        }
-        return 'Localização desconhecida';
     }
 }

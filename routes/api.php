@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Account\AccountController;
 use App\Http\Controllers\Api\V1\Account\VerificationController;
 use App\Http\Controllers\Api\V1\User\UserController;
 use App\Http\Controllers\Api\V1\Upload\PhotoUploadController;
+use App\Http\Controllers\Api\V1\Follower\FollowerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,8 +41,8 @@ Route::group(['middleware' => ['auth:api'], 'prefix' => 'users'], function ($rou
     Route::get('/', [UserController::class, 'index']);
     Route::get('/nearby-location', [UserController::class, 'get_list_nearby_users']);
     Route::get('/{id}', [UserController::class, 'show']);
-    Route::get('/{id}/follow', [UserController::class, 'show']);
-    Route::get('/{id}/following', [UserController::class, 'show']);
+    Route::post('/{id}/action', [FollowerController::class, 'show']);
+    Route::post('/{id}/followers', [FollowerController::class, 'show']);
 });
 
 Route::group(['middleware' => ['auth:api'], 'prefix' => 'photos'], function ($router) {
