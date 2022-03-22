@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\Contracts\AccountRepositoryInterface; 
+use Illuminate\Support\Facades\DB;
 
 class AccountController extends AppBaseController
 {
@@ -37,7 +38,7 @@ class AccountController extends AppBaseController
         }
         
         $data = $this->accountRepository->createAccount($request);
-        return $this->sendResponse($data, __('auth.login_successfully'));
+        return $this->sendResponse($data, __('auth.signup_successfully'));
     }
 
     public function login(Request $request)
@@ -55,6 +56,8 @@ class AccountController extends AppBaseController
         if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             return $this->sendError(__('auth.failed_login'), 400);
         }
+
+        $user = DB::table('users')->where('email', $request->email)->first();
         
         $data = $this->accountRepository->authSession($request);
         return $this->sendResponse($data, __('auth.login_successfully'));

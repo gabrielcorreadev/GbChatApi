@@ -23,4 +23,6 @@ return [
     'device_not_found' => 'Device not found.',
     'no_devices_found' => 'No devices found.',
     'login_successfully' => 'Login successfully',
+    'signup_successfully' => 'Account created successfully',
+    'unverified_email' => 'This Account has not been activated',
 ];

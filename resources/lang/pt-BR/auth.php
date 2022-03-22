@@ -22,4 +22,6 @@ return [
     'device_not_found' => 'Dispositivo não encontrado.',
     'no_devices_found' => 'Nenhum dispositivo encontrado.',
     'login_successfully' => 'Login realizado com sucesso',
+    'signup_successfully' => 'Conta criada com sucesso',
+    'unverified_email' => 'Essa Conta não foi ativada',
 ];
