@@ -14,7 +14,7 @@ class PhotoUploadController extends Controller
     public function upload_profile(Request $request) 
     { 
         $validator = Validator::make($request->all(),[ 
-              'file' => 'required|mimes:png,jpg,jpeg,gif|max:2305',
+              'file' => 'required|mimes:png,jpg,jpeg,gif|max:9305',
         ]);   
   
         if($validator->fails()) {          
