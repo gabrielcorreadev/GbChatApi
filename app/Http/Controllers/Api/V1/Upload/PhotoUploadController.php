@@ -52,7 +52,7 @@ class PhotoUploadController extends AppBaseController
   
    
         if ($file = $request->file('file')) {
-            $path = $file->store('public/files');
+            $path = $file->store('public');
             $name = $file->getClientOriginalName();
   
             //store your file into directory and db
