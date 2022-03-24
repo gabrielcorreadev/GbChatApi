@@ -51,7 +51,7 @@ Route::group(['middleware' => ['auth:api'], 'prefix' => 'photos'], function ($ro
     Route::post('/upload-profile', [PhotoUploadController::class, 'upload_profile']); 
 });
 
-Route::get('storage/{filename}', function ($filename)
+Route::get('storage/files/{filename}', function ($filename)
 {
     $path = storage_path('public/' . $filename);
 

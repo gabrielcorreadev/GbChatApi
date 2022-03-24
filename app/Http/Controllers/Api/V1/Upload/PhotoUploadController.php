@@ -8,8 +8,10 @@ use App\Models\User;
 use App\Models\Photo; 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Api\AppBaseController;
+use Illuminate\Support\Facades\Storage;
 
-class PhotoUploadController extends Controller
+class PhotoUploadController extends AppBaseController
 {
     public function upload_profile(Request $request) 
     { 
@@ -18,8 +20,7 @@ class PhotoUploadController extends Controller
         ]);   
   
         if($validator->fails()) {          
-             
-            return response()->json(['error'=>$validator->errors()], 401);                        
+            return $this->sendError($validator->errors()->first(), 400);                      
          }  
   
    
@@ -31,11 +32,7 @@ class PhotoUploadController extends Controller
                 'photo_url' => $path,
             ]);
 
-            return response()->json([
-                "success" => true,
-                "message" => "File successfully uploaded",
-                "file" => $file
-            ]);
+            return $this->sendResponse(url(Storage::url($path)), __('upload.file_successfully_uploaded'));
    
         }
   
