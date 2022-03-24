@@ -25,7 +25,7 @@ class PhotoUploadController extends AppBaseController
   
    
         if ($file = $request->file('file')) {
-            $path = $file->store('public/files');
+            $path = $file->store('public');
             $name = $file->getClientOriginalName();
                
             User::where('id', Auth::user()->id)->update([
