@@ -41,7 +41,7 @@ class AccountRepository implements AccountRepositoryInterface
             'longitude' => $request->longitude,
         ]);
 
-        return $this->respondWithToken($user_token->accessToken);
+        return $this->respondWithToken($user_token->accessToken, $user);
     }
 
     public function authSession(Request $request)
@@ -70,7 +70,7 @@ class AccountRepository implements AccountRepositoryInterface
         ];
         
         $user->notify(new NewLogin($details));
-        return $this->respondWithToken($user_token->accessToken);
+        return $this->respondWithToken($user_token->accessToken, auth()->user());
     }
 
     public function removeSession(Request $request)
@@ -80,10 +80,10 @@ class AccountRepository implements AccountRepositoryInterface
         $token->delete();
     }
 
-    public function respondWithToken($token)
+    public function respondWithToken($token, $user)
     {
         return [
-            'user' => auth()->user(),
+            'user' => $user,
             'access_token' => $token,
             'token_type' => 'bearer'
         ];

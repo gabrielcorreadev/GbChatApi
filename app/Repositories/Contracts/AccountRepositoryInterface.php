@@ -11,5 +11,5 @@ interface AccountRepositoryInterface
 
     public function removeSession(Request $request);
 
-    public function respondWithToken($token);
+    public function respondWithToken($token, $user);
 }
