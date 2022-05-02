@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Api\AppBaseController;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class PhotoUploadController extends AppBaseController
 {
@@ -28,6 +29,12 @@ class PhotoUploadController extends AppBaseController
             $path = $file->store('public');
             $name = $file->getClientOriginalName();
                
+            $user = User::where('id', Auth::user()->id)->first();
+
+            if ($user->photo_url) {
+                Storage::delete($user->photo_url);
+            }
+
             User::where('id', Auth::user()->id)->update([
                 'photo_url' => $path,
             ]);
@@ -38,6 +45,16 @@ class PhotoUploadController extends AppBaseController
   
    
     }
+
+    public function remove_photo(Request $request) 
+    { 
+        $user = User::where('id', Auth::user()->id)->first();
+        if ($user->photo_url) {
+            Storage::delete($user->photo_url);
+        }
+        return $this->sendSuccess('Foto removida com sucesso');
+    }
+
 
     public function upload_images(Request $request) 
     { 

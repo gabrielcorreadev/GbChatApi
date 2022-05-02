@@ -49,5 +49,6 @@ Route::group(['middleware' => ['auth:api'], 'prefix' => 'users'], function ($rou
 
 Route::group(['middleware' => ['auth:api'], 'prefix' => 'photos'], function ($router) {
     Route::post('/upload-profile', [PhotoUploadController::class, 'upload_profile']); 
+    Route::post('/remove-profile', [PhotoUploadController::class, 'remove_photo']); 
 });
 
