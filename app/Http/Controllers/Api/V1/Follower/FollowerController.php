@@ -4,60 +4,71 @@ namespace App\Http\Controllers\Api\V1\Follower;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Api\AppBaseController;
+use App\Http\Resources\UserResource as UserResource;
+use App\Repositories\Contracts\NotificationRepositoryInterface;
+use App\Models\User;
+use App\Models\Device;
 
-class FollowerController extends Controller
+class FollowerController extends AppBaseController
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function getConversation()
-    {
-        //
-    }
+    /** @var NotificationRepository */
+    private $notificationRepository;
+    private $device;
 
     /**
-     * Show the form for creating a new resource.
+     * Create a new controller instance.
      *
-     * @return \Illuminate\Http\Response
+     * @param  DeviceRepository 
      */
-    public function create()
+    public function __construct(NotificationRepositoryInterface $notificationRepo, Device $device)
     {
-        //
+        $this->notificationRepository = $notificationRepo;
+        $this->device = $device;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function getMessages($id)
+    public function show($id)
     {
-        //
+        $user = User::find($id);
+        $followers = $user->followers;
+        return UserResource::collection($followers);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function sendMessage(Request $request, $id)
+    public function followUser($id)
     {
-        //
+        $user = User::find($id);
+        $user_auth = User::find(auth()->user()->id);
+
+        if (!$user) {
+            return $this->sendError('User does not exist.', 400);
+        }
+
+        $player_ids = $this->device->where('user_id', $id)->pluck('player_id')->toArray();
+
+        if (count($player_ids) > 0) {
+
+            $data = [
+                'title' => 'GbChat',
+                'content' => $user_auth->name. ' começou a seguir você.',
+                'icon' => $user_auth->photo,
+            ];
+
+            $user->followers()->attach(auth()->user()->id);
+
+            $this->notificationRepository->createNotification($data, $player_ids);
+        }
+
+        return $this->sendSuccess('Successfully followed the user.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    public function unFollowUser($id)
     {
-        //
+        $user = User::find($id);
+        if (!$user) {
+            return $this->sendError('User does not exist.', 400);
+        }
+
+        $user->followers()->detach(auth()->user()->id);
+        return $this->sendSuccess('Successfully unfollowed the user.');
     }
 }

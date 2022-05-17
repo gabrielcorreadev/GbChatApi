@@ -43,8 +43,9 @@ Route::group(['middleware' => ['auth:api'], 'prefix' => 'users'], function ($rou
     Route::get('/', [UserController::class, 'index']);
     Route::get('/nearby-location', [UserController::class, 'get_list_nearby_users']);
     Route::get('/{id}', [UserController::class, 'show']);
-    Route::post('/{id}/action', [FollowerController::class, 'show']);
-    Route::post('/{id}/followers', [FollowerController::class, 'show']);
+    Route::post('/{id}/follow', [FollowerController::class, 'followUser']);
+    Route::post('/{id}/unfollow', [FollowerController::class, 'unFollowUser']);
+    Route::get('/{id}/followers', [FollowerController::class, 'show']);
 });
 
 Route::group(['middleware' => ['auth:api'], 'prefix' => 'photos'], function ($router) {

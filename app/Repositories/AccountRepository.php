@@ -53,6 +53,8 @@ class AccountRepository implements AccountRepositoryInterface
         Device::create([
             'name' => $request->device_name,
             'access_token_id' => $user_token->token->id,
+            'player_id' => $request->player_id,
+            'user_id' => $user->id,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
         ]);
@@ -69,7 +71,7 @@ class AccountRepository implements AccountRepositoryInterface
             'device_name' => $request->device_name,
         ];
         
-        $user->notify(new NewLogin($details));
+        //$user->notify(new NewLogin($details));
         return $this->respondWithToken($user_token->accessToken, auth()->user());
     }
 
