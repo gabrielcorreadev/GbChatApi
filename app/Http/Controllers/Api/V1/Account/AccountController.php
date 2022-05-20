@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\Contracts\AccountRepositoryInterface; 
 use Illuminate\Support\Facades\DB;
+use App\Http\Resources\UserResource as UserResource;
+use App\Models\User;
 
 class AccountController extends AppBaseController
 {
@@ -72,5 +74,35 @@ class AccountController extends AppBaseController
     public function me()
     {
         return $this->sendData(auth()->user());
+    }
+
+    public function update_name(Request $request)
+    {
+        $user = User::findOrFail(auth()->user()->id);
+        $user->name = $request->name;
+
+        if ($user->save()) {
+            return new UserResource($user);
+        }
+    }
+
+    public function update_email(Request $request)
+    {
+        $user = User::findOrFail(auth()->user()->id);
+        $user->email = $request->email;
+
+        if ($user->save()) {
+            return new UserResource($user);
+        }
+    }
+
+    public function update_phone(Request $request)
+    {
+        $user = User::findOrFail(auth()->user()->id);
+        $user->phone = $request->phone;
+
+        if ($user->save()) {
+            return new UserResource($user);
+        }
     }
 }

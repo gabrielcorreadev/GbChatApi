@@ -14,54 +14,35 @@ class FollowerController extends AppBaseController
 {
     /** @var NotificationRepository */
     private $notificationRepository;
-    private $device;
 
-    /**
-     * Create a new controller instance.
-     *
-     * @param  DeviceRepository 
-     */
-    public function __construct(NotificationRepositoryInterface $notificationRepo, Device $device)
+    public function __construct(NotificationRepositoryInterface $notificationRepo)
     {
         $this->notificationRepository = $notificationRepo;
-        $this->device = $device;
     }
 
-    public function show($id)
+    public function followers($id)
     {
         $user = User::find($id);
         $followers = $user->followers;
         return UserResource::collection($followers);
     }
 
-    public function followUser($id)
+    public function follow_user($id)
     {
         $user = User::find($id);
-        $user_auth = User::find(auth()->user()->id);
 
         if (!$user) {
             return $this->sendError('User does not exist.', 400);
         }
 
-        $player_ids = $this->device->where('user_id', $id)->pluck('player_id')->toArray();
+        $user->followers()->attach(auth()->user()->id);
 
-        if (count($player_ids) > 0) {
-
-            $data = [
-                'title' => 'GbChat',
-                'content' => $user_auth->name. ' começou a seguir você.',
-                'icon' => $user_auth->photo,
-            ];
-
-            $user->followers()->attach(auth()->user()->id);
-
-            $this->notificationRepository->createNotification($data, $player_ids);
-        }
+        $this->notificationRepository->newFollower($id);
 
         return $this->sendSuccess('Successfully followed the user.');
     }
 
-    public function unFollowUser($id)
+    public function unfollow_user($id)
     {
         $user = User::find($id);
         if (!$user) {

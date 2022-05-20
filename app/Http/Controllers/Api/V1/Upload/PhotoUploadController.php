@@ -2,18 +2,22 @@
 
 namespace App\Http\Controllers\Api\V1\Upload;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\Photo; 
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Api\AppBaseController;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\File;
+use App\Repositories\Contracts\PhotoRepositoryInterface; 
 
 class PhotoUploadController extends AppBaseController
 {
+            /** @var PhotoRepository */
+            private $photoRepository;
+
+            public function __construct(PhotoRepositoryInterface $photoRepo)
+            {
+                $this->photoRepository = $photoRepo;
+            }
+
     public function upload_profile(Request $request) 
     { 
         $validator = Validator::make($request->all(),[ 
@@ -24,68 +28,42 @@ class PhotoUploadController extends AppBaseController
             return $this->sendError($validator->errors()->first(), 400);                      
          }  
   
-   
-        if ($file = $request->file('file')) {
-            $path = $file->store('public');
-            $name = $file->getClientOriginalName();
-               
-            $user = User::where('id', Auth::user()->id)->first();
+        if ($request->file('file')) {
 
-            if ($user->photo_url) {
-                Storage::delete($user->photo_url);
-            }
+            $data = $this->photoRepository->uploadProfile($request);
 
-            User::where('id', Auth::user()->id)->update([
-                'photo_url' => $path,
-            ]);
-
-            return $this->sendResponse(url(Storage::url($path)), __('upload.file_successfully_uploaded'));
+            return $this->sendResponse(url(Storage::url($data)), __('upload.file_successfully_uploaded'));
    
         }
-  
-   
     }
 
-    public function remove_photo(Request $request) 
+    public function remove_profile() 
     { 
-        $user = User::where('id', Auth::user()->id)->first();
-        if ($user->photo_url) {
-            Storage::delete($user->photo_url);
-        }
+        $this->photoRepository->removeProfile();
         return $this->sendSuccess('Foto removida com sucesso');
     }
 
-
-    public function upload_images(Request $request) 
+    public function upload_cover(Request $request) 
     { 
         $validator = Validator::make($request->all(),[ 
               'file' => 'required|mimes:png,jpg,jpeg,gif|max:9305',
         ]);   
   
         if($validator->fails()) {          
-             
-            return response()->json(['error'=>$validator->errors()], 401);                        
+            return $this->sendError($validator->errors()->first(), 400);                      
          }  
   
-   
-        if ($file = $request->file('file')) {
-            $path = $file->store('public');
-            $name = $file->getClientOriginalName();
-  
-            //store your file into directory and db
-            $save = new Photo();
-            $save->name = $name;
-            $save->path= $path;
-            $save->user_id = Auth::user()->id;
-            $save->type= '1';
-            $save->save();
-               
-            return response()->json([
-                "success" => true,
-                "message" => "File successfully uploaded",
-                "file" => $file
-            ]);
+        if ($request->file('file')) {
+
+            $data = $this->photoRepository->uploadCover($request);
+            return $this->sendResponse(url(Storage::url($data)), __('upload.file_successfully_uploaded'));
    
         }
+    }
+
+    public function remove_cover() 
+    { 
+        $this->photoRepository->removeCover();
+        return $this->sendSuccess('Foto removida com sucesso');
     }
 }

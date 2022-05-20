@@ -5,5 +5,9 @@ use Illuminate\Http\Request;
 
 interface NotificationRepositoryInterface
 {
-    public function createNotification($data, $player_ids);
+    public function newFollower($id);
+
+    public function sendNotification($params);
+
+    public function createNotification($data);
 }

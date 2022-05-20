@@ -31,6 +31,9 @@ Route::get('email/resend', [VerificationController::class, 'resend'])->name('ver
 Route::group(['middleware' => ['auth:api'], 'prefix' => 'auth'], function ($router) {
     Route::post('/logout', [AccountController::class, 'logout']);
     Route::get('/me', [AccountController::class, 'me']);
+    Route::put('/change-name', [AccountController::class, 'update_name']);
+    Route::put('/change-email', [AccountController::class, 'update_email']);
+    Route::put('/change-phone', [AccountController::class, 'update_phone']);
 });
 
 Route::group(['middleware' => ['auth:api'], 'prefix' => 'devices'], function ($router) {
@@ -43,12 +46,15 @@ Route::group(['middleware' => ['auth:api'], 'prefix' => 'users'], function ($rou
     Route::get('/', [UserController::class, 'index']);
     Route::get('/nearby-location', [UserController::class, 'get_list_nearby_users']);
     Route::get('/{id}', [UserController::class, 'show']);
-    Route::post('/{id}/follow', [FollowerController::class, 'followUser']);
-    Route::post('/{id}/unfollow', [FollowerController::class, 'unFollowUser']);
-    Route::get('/{id}/followers', [FollowerController::class, 'show']);
+    Route::put('/{id}/change-name', [UserController::class, 'update_name']);
+    Route::put('/{id}/change-email', [UserController::class, 'update_email']);
+    Route::put('/{id}/change-phone', [UserController::class, 'update_phone']);
+    Route::post('/{id}/follow', [UserController::class, 'follow_user']);
+    Route::post('/{id}/unfollow', [UserController::class, 'unfollow_user']);
+    Route::get('/{id}/followers', [UserController::class, 'followers']);
 });
 
-Route::group(['middleware' => ['auth:api'], 'prefix' => 'photos'], function ($router) {
+Route::group(['middleware' => ['auth:api'], 'prefix' => 'user'], function ($router) {
     Route::post('/upload-profile', [PhotoUploadController::class, 'upload_profile']); 
     Route::post('/remove-profile', [PhotoUploadController::class, 'remove_photo']); 
 });
