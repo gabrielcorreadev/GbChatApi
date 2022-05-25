@@ -7,9 +7,10 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\Contracts\NotificationRepositoryInterface;
+use App\Http\Controllers\Api\AppBaseController;
 use App\Http\Resources\UserResource as UserResource;
 
-class UserController extends Controller
+class UserController extends AppBaseController
 {
     /** @var NotificationRepository */
     private $notificationRepository;

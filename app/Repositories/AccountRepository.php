@@ -71,7 +71,7 @@ class AccountRepository implements AccountRepositoryInterface
             'device_name' => $request->device_name,
         ];
         
-        //$user->notify(new NewLogin($details));
+        $user->notify(new NewLogin($details));
         return $this->respondWithToken($user_token->accessToken, auth()->user());
     }
 
